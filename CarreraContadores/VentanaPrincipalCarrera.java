@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Date;
+import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -49,11 +51,11 @@ public class VentanaPrincipalCarrera extends JFrame implements ActionListener ,
     PanelCuentaAtras jp_derecha;
     PanelCuentaDelante jp_izquierda;
     boolean bandera_llegada = true;
-   // Timer control_hilo_ejecucion;
+    Timer control_hilo_ejecucion;
     int velocidad_ejecucion,velocidad_ejecucion1;
 
     Thread   cronoshilo,tempohilo,relohilo,adelante_contarhilo,atras_contarhilo;
-
+java.util.Timer timer ;
 
     void JSilderComponents() {
 
@@ -96,12 +98,44 @@ public class VentanaPrincipalCarrera extends JFrame implements ActionListener ,
         jp_center_panel.add(jp_centro, BorderLayout.CENTER);
 
 this.setVisible(Visible_ventana);
-//        control_hilo_ejecucion = new Timer(10000, this);
-//        control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 7); //We pause animation twice per cycle
-//        //by restarting the timer
-//        control_hilo_ejecucion.setCoalesce(true);
+        control_hilo_ejecucion = new Timer(10000, this);
+        control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 7); //We pause animation twice per cycle
+        //by restarting the timer
+        control_hilo_ejecucion.setCoalesce(true);
+        timer = new java.util.Timer();
+        timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
+    TimerTask timerTask = new TimerTask()
+    {
+        /**
+         * Método al que Timer llamará cada segundo. Se encarga de avisar
+         * a los observadores de este modelo.
+         */
+        public void run()
+        {
+            if (!adelante_contar.isBandera_llegada() && !atras_contar.isBandera_llegada()){
+                cronos.setBandera_llegada(false);
+                tempo.setBandera_llegada(false);
+                fech.setBandera_llegada(false);
+                System.out.println(" Entro time");
+                System.out.println(" Entro time");
+                System.out.println(" Entro time");
+                System.out.println(" Entro time");
+                System.out.println(" Entro time");
+                try {
+                    timerTask.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("No Entro time");
+            System.out.println("No Entro time");
+            System.out.println("No Entro time");
+            System.out.println("No Entro time");
+            System.out.println("No Entro time");
 
+        }
+    };
     public synchronized void CenterPanel() {
         jp_center_panel  = new JPanel();
         jp_center_panel.setLayout(new BorderLayout(5, 5));
@@ -165,7 +199,7 @@ this.setVisible(Visible_ventana);
 
     public synchronized void iniciarEjecucion() {
         //Start (or restart) animating!
-//        control_hilo_ejecucion.start();
+        control_hilo_ejecucion.start();
         bandera_llegada = false;
 
         btn_iniciar.setEnabled(false);
@@ -182,7 +216,7 @@ this.setVisible(Visible_ventana);
 
     public synchronized void detenerEjecucion() {
         //Stop the animating thread.
-//        control_hilo_ejecucion.stop();
+       control_hilo_ejecucion.stop();
         bandera_llegada = true;
 
         btn_iniciar.setEnabled(true);
@@ -239,7 +273,7 @@ this.setVisible(Visible_ventana);
         if (e.getSource() == btn_iniciar) {
             iniciarEjecucion();
         } else if(e.getSource() == btn_parar){
-         //   detenerEjecucion();
+            detenerEjecucion();
             relohilo.stop();
             cronos.setBandera_llegada(false);
             tempohilo.stop();

@@ -5,7 +5,7 @@ import javax.swing.*;
 public class Cronometro extends JLabel implements Runnable{
 int hora=0, minutos=0,segundos=0;
     boolean bandera_llegada = true;
-    
+
 
 
     @Override

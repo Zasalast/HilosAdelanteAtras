@@ -35,8 +35,8 @@ private int velocidad=1000;
             } catch (InterruptedException e3) {
                 e3.printStackTrace();
             }
-        }
- }
+        }bandera_llegada=false;
+    }
 
     public boolean isBandera_llegada() {
         return bandera_llegada;
