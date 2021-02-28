@@ -14,7 +14,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
+// import java.util.Timer;
 import static java.awt.Color.green;
 
 /*
@@ -34,33 +34,34 @@ public class VentanaPrincipalCarrera extends JFrame implements ActionListener ,
     Cronometro cronos;
     AdelanteContar adelante_contar;
     AtrasContar atras_contar;
-    JLabel fecha_JLabel, hora_JLabel;
-
-    JTextField Horas, Minutos, Segundos;
-
-   JButton btn_iniciar, btn_pausar, btn_reanudar, btn_parar, btn_iniciar_cuenta_delante, btn_pausar_cuenta_delante, btn_reiniciar_cuenta_delante, btn_parar_cuenta_delante;
+    PanelDisplay jp_controles,jp_informe;
 
     JPanel jp_center_panel, jp_centro;
-    JSlider silder1, silder2;
+    PanelCuentaAtras jp_derecha;
+    PanelCuentaDelante jp_izquierda;
+
+    Timer control_hilo_ejecucion;
+    java.util.Timer timer;
+
+    Thread   cronoshilo,tempohilo,relohilo,adelante_contarhilo,atras_contarhilo;
+    JTextField Horas, Minutos, Segundos;
+    JLabel fecha_JLabel, hora_JLabel;
+   JButton btn_iniciar, btn_pausar, btn_reanudar, btn_parar, btn_iniciar_cuenta_delante, btn_pausar_cuenta_delante, btn_reiniciar_cuenta_delante, btn_parar_cuenta_delante;
+  JSlider silder1, silder2;
+
     //Set up animation parameters.
     static final int FPS_MIN = 100;
     static final int FPS_MAX = 400;
     static final int FPS_INIT = 100;
 
-    PanelCuentaAtras jp_derecha;
-    PanelCuentaDelante jp_izquierda;
     boolean bandera_llegada = true;
-    Timer control_hilo_ejecucion;
     int velocidad_ejecucion,velocidad_ejecucion1;
 
-    Thread   cronoshilo,tempohilo,relohilo,adelante_contarhilo,atras_contarhilo;
-java.util.Timer timer ;
+
 
     void JSilderComponents() {
-
         silder1 = new JSlider(JSlider.HORIZONTAL,
                 FPS_MIN, FPS_MAX, FPS_INIT);
-
         silder1.addChangeListener(this);
         silder1.setPaintTicks(true);
         silder1.setMajorTickSpacing(100);
@@ -172,16 +173,20 @@ this.setVisible(Visible_ventana);
         jp_izquierda.AddComponentes(silder1);
 
     }
-    PanelDisplay jp_controles;
+
     public synchronized void ControlesPanelFlowLayout() {
 
         jp_controles=new PanelDisplay();
         jp_center_panel.add(jp_controles.componente(),
                 BorderLayout.PAGE_END);
 
-        jp_controles.AddComponentes(cronos);
-        jp_controles.AddComponentes(fech);
-        jp_controles.AddComponentes(tempo);
+        jp_informe=new PanelDisplay();
+        jp_center_panel.add(jp_informe.componente(),
+                BorderLayout.PAGE_START);
+
+        jp_informe.AddComponentes(cronos);
+        jp_informe.AddComponentes(fech);
+        jp_informe.AddComponentes(tempo);
         jp_controles.AddComponentes(btn_iniciar);
         jp_controles.AddComponentes(btn_pausar);
         jp_controles.AddComponentes(btn_reanudar);
@@ -306,8 +311,8 @@ this.setVisible(Visible_ventana);
 
              tempo=new Temporizador(0,1,6);
             tempohilo=new Thread(tempo);
-        fecha_JLabel = new JLabel(""+fech.Fecha());
-        hora_JLabel = new JLabel(" "+fech.hora());
+       // fecha_JLabel = new JLabel(""+fech.Fecha());
+       // hora_JLabel = new JLabel(" "+fech.hora());
     }
 
     void JButtonComponents() {
