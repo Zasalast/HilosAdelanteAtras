@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.Date;
 import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -39,7 +38,7 @@ public class VentanaPrincipalCarrera extends JFrame implements ActionListener ,
 
     JTextField Horas, Minutos, Segundos;
 
-   JButton btn_iniciar, btn_pausar, btn_reiniciar, btn_parar, btn_iniciar_cuenta_delante, btn_pausar_cuenta_delante, btn_reiniciar_cuenta_delante, btn_parar_cuenta_delante;
+   JButton btn_iniciar, btn_pausar, btn_reanudar, btn_parar, btn_iniciar_cuenta_delante, btn_pausar_cuenta_delante, btn_reiniciar_cuenta_delante, btn_parar_cuenta_delante;
 
     JPanel jp_center_panel, jp_centro;
     JSlider silder1, silder2;
@@ -62,14 +61,14 @@ java.util.Timer timer ;
         silder1 = new JSlider(JSlider.HORIZONTAL,
                 FPS_MIN, FPS_MAX, FPS_INIT);
 
-
+        silder1.addChangeListener(this);
         silder1.setPaintTicks(true);
         silder1.setMajorTickSpacing(100);
         silder1.setPaintLabels(true);
         silder1.setBorder(BorderFactory.createTitledBorder("Velocidad"));
         silder2 = new JSlider(JSlider.HORIZONTAL,
                 FPS_MIN, FPS_MAX, FPS_INIT);
-
+        silder2.addChangeListener(this);
 
         silder2.setPaintTicks(true);
         silder2.setMajorTickSpacing(100);
@@ -99,7 +98,7 @@ java.util.Timer timer ;
 
 this.setVisible(Visible_ventana);
         control_hilo_ejecucion = new Timer(10000, this);
-        control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 7); //We pause animation twice per cycle
+        //control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 7); //We pause animation twice per cycle
         //by restarting the timer
         control_hilo_ejecucion.setCoalesce(true);
         timer = new java.util.Timer();
@@ -122,6 +121,7 @@ this.setVisible(Visible_ventana);
                 System.out.println(" Entro time");
                 System.out.println(" Entro time");
                 System.out.println(" Entro time");
+                timerTask.notify();
                 try {
                     timerTask.wait();
                 } catch (InterruptedException e) {
@@ -184,17 +184,17 @@ this.setVisible(Visible_ventana);
         jp_controles.AddComponentes(tempo);
         jp_controles.AddComponentes(btn_iniciar);
         jp_controles.AddComponentes(btn_pausar);
-        jp_controles.AddComponentes(btn_reiniciar);
+        jp_controles.AddComponentes(btn_reanudar);
         jp_controles.AddComponentes(btn_parar);
     }
 
 
     void  Components() {
-
+        JSilderComponents();
         JTextFieldsComponents();
         JButtonComponents();
         JLabelComponents();
-        JSilderComponents();
+
     }
 
     public synchronized void iniciarEjecucion() {
@@ -214,12 +214,42 @@ this.setVisible(Visible_ventana);
 
     }
 
+
+    public synchronized void pausarEjecucion() {
+        //Stop the animating thread.
+        control_hilo_ejecucion.stop();
+        bandera_llegada = true;
+
+        btn_reanudar.setEnabled(true);
+        relohilo.suspend();
+        cronoshilo.suspend();
+        tempohilo.suspend();
+        adelante_contarhilo.suspend();
+        atras_contarhilo.suspend();
+    }
+
+
+    public synchronized void reanudarEjecucion() {
+        //Stop the animating thread.
+        control_hilo_ejecucion.stop();
+        bandera_llegada = true;
+        btn_parar.setEnabled(true);
+        btn_pausar.setEnabled(true);
+        relohilo.stop();
+        cronoshilo.stop();
+        tempohilo.stop();
+        adelante_contarhilo.stop();
+        atras_contarhilo.stop();
+    }
+
+
+
     public synchronized void detenerEjecucion() {
         //Stop the animating thread.
        control_hilo_ejecucion.stop();
         bandera_llegada = true;
 
-        btn_iniciar.setEnabled(true);
+
         relohilo.stop();
         cronoshilo.stop();
         tempohilo.stop();
@@ -234,36 +264,20 @@ this.setVisible(Visible_ventana);
         if (e.getSource() == silder1) {
 
             silder1 = (JSlider)e.getSource();
-            if (!silder1.getValueIsAdjusting()) {
+           // if (!silder1.getValueIsAdjusting()) {
                 int fps = (int)silder1.getValue();
+                setVelocidad_ejecucion(fps);
                 adelante_contar.setVelocidad(fps);
-
-                if (fps == 0) {
-                    if (!bandera_llegada) detenerEjecucion();
-                } else {
-                    velocidad_ejecucion = 100 / fps;
-//                    control_hilo_ejecucion.setDelay(velocidad_ejecucion);
-//                    control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 10000);
-                    if (bandera_llegada) detenerEjecucion();
-
-                }
-            }
+           // }
         }
 
         if (e.getSource() == silder2) {
             silder2 = (JSlider)e.getSource();
-        if (!silder2.getValueIsAdjusting()) {
+
             int fps = (int)silder2.getValue();
+            setVelocidad_ejecucion1(fps);
              atras_contar.setVelocidad(fps);
-            if (fps == 0) {
-                if (!bandera_llegada) detenerEjecucion();
-            } else {
-                velocidad_ejecucion = 1000 / fps;
-//                control_hilo_ejecucion.setDelay(velocidad_ejecucion);
-//                control_hilo_ejecucion.setInitialDelay(velocidad_ejecucion * 10);
-                if (bandera_llegada) detenerEjecucion();
-            }
-        }
+
         }
     }
 
@@ -303,12 +317,12 @@ this.setVisible(Visible_ventana);
         btn_pausar = new JButton("Pausa");
         btn_pausar.setEnabled(false);
          btn_pausar.addActionListener(this);
-        btn_reiniciar = new JButton("Reiniciar");
-        btn_reiniciar.setEnabled(false);
-        btn_reiniciar.addActionListener(this);
+        btn_reanudar = new JButton("Reiniciar");
+        btn_reanudar.setEnabled(false);
+        btn_reanudar.addActionListener(this);
         btn_parar = new JButton("Parar");
         btn_parar.setEnabled(false);
-           btn_reiniciar.addActionListener( this);
+        btn_parar.addActionListener( this);
 
     }    void JTextFieldsComponents() {
 

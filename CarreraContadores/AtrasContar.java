@@ -18,14 +18,14 @@ public class AtrasContar extends JTextField implements Runnable{
     }
     @Override
     public synchronized void run() {
-        int i=10;
+        int i=1000;
         while (bandera_llegada){
             if (i > 0){
                 i--;
                 this.setText(""+i);
                 System.out.println("hilo    "+" "+i);
                 try {
-                    Thread.sleep(velocidad);
+                    Thread.sleep(6*getVelocidad());
                 } catch (InterruptedException e3) {
                     e3.printStackTrace();
                 }

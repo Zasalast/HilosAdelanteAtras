@@ -27,20 +27,29 @@ private int velocidad=1000;
 
     @Override
     public synchronized void run() {
-        for (int i = 0; i <= 10; i++) {
-            this.setText(""+i);
-            System.out.println("hilo    "+" "+i);
-            try {
-                Thread.sleep(velocidad);
-            } catch (InterruptedException e3) {
-                e3.printStackTrace();
-            }
-        }bandera_llegada=false;
-    }
 
-    public boolean isBandera_llegada() {
-        return bandera_llegada;
+
+        int i = 0;
+        while (bandera_llegada) {
+            if (i < 1000) {
+                i++;
+
+
+                this.setText("" + i);
+                System.out.println("hilo    " + " " + i);
+                try {
+                    Thread.sleep(6 * getVelocidad());
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+            } else {
+                bandera_llegada = false;
+            }
+        }
     }
+        public boolean isBandera_llegada() {
+            return bandera_llegada;
+        }
 
     public void setBandera_llegada(boolean bandera_llegada) {
         this.bandera_llegada = bandera_llegada;
